@@ -46,5 +46,6 @@ hdfs dfs -mkdir "/user/$USER/hospital_compare"
 echo "Loading into HDFS..."
 for i in {0..4}; do
 	echo " - loading #$i: ${outnames[$i]}"
-	hdfs dfs -put "processed/${outnames[$i]}.csv" "/user/$USER/hospital_compare"
+	hdfs dfs -mkdir "/user/$USER/hospital_compare/${outnames[$i]}"
+	hdfs dfs -put "processed/${outnames[$i]}.csv" "/user/$USER/hospital_compare/${outnames[$i]}"
 done

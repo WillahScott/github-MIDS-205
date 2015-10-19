@@ -1,76 +1,52 @@
 
-## LOAD HDFS DATA INTO HIVE
+-- LOAD HDFS TABLES INTO HIVE
 
-# Table: hospitals.csv
+--Table: hospitals.csv
+DROP TABLE IF EXISTS hospitals;
 CREATE EXTERNAL TABLE hospitals
-		(ProviderID STRING, HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode STRING, County STRING, PhoneNumber STRING,
-		HospitalType STRING, HospitalOwnership STRING, EmergencyServices STRING)
-	ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-	WITH SERDEPROPERTIES (
-		"separatorChar" = ",",
-		"quoteChar" = '"',
-		"escapeChar" = '\\'
-	)
+	(ProviderID VARCHAR(10), HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode VARCHAR(5), County STRING, PhoneNumber BIGINT, HospitalType STRING, HospitalOwnership STRING, EmergencyServices STRING)
+	ROW FORMAT DELIMITED
+	FIELDS TERMINATED BY ','
 	STORED AS TEXTFILE
 	LOCATION '/user/w205/hospital_compare/hospitals';
 
 
-# Table: effective_care.csv
+--Table: effective_care.csv
+DROP TABLE IF EXISTS effective_care;
 CREATE EXTERNAL TABLE effective_care
-		(ProviderID STRING, HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode STRING, County STRING, PhoneNumber STRING,
-		Condition STRING, MeasureID STRING, MeasureName STRING, Score STRING, Sample STRING, Footnote STRING, MeasureStartDate STRING, MeasureEndDate STRING)
+	(ProviderID VARCHAR(10), HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode VARCHAR(5), County STRING, PhoneNumber BIGINT, Condition STRING, MeasureID VARCHAR(20), MeasureName STRING, Score STRING, Sample STRING, Footnote STRING, MeasureStartDate TIMESTAMP, MeasureEndDate TIMESTAMP)
 	ROW FORMAT DELIMITED
-	FIELDS TERMINATED BY ‘,’
+	FIELDS TERMINATED BY ','
 	STORED AS TEXTFILE
 	LOCATION '/user/w205/hospital_compare/effective_care';
 
 
-# Table: measure_dates.csv
+--Table: measure_dates.csv
+DROP TABLE IF EXISTS measure_dates;
 CREATE EXTERNAL TABLE measure_dates
-		(MeasureName STRING, MeasureID STRING, MeasureStartQtr STRING, MeasureStartDate STRING, MeasureEndQtr STRING, MeasureEndDate STRING)
-	ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-	WITH SERDEPROPERTIES (
-		"separatorChar" = ",",
-		"quoteChar" = '"',
-		"escapeChar" = '\\'
-	)
-	STORED AS TEXTFILE
+	(MeasureName STRING, MeasureID VARCHAR(20), MeasureStartQtr TIMESTAMP, MeasureStartDate TIMESTAMP, MeasureEndQtr TIMESTAMP, MeasureEndDate TIMESTAMP)
+	ROW FORMAT DELIMITED
+	FIELDS TERMINATED BY ','
+	STORED as textfile
 	LOCATION '/user/w205/hospital_compare/measure_dates';
 
 
-# Table: readmissions.csv
+--Table: readmissions.csv
+DROP TABLE IF EXISTS readmissions;
 CREATE EXTERNAL TABLE readmissions
-		(ProviderID STRING, HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode STRING, County STRING, PhoneNumber STRING,
-		MeasureName STRING, MeasureID STRING, ComparedToNat STRING, Denominator STRING, Score STRING, LowerEst STRING, HigherEst STRING, Footnote STRING,
-		MeasureStartDate STRING, MeasureEndDate STRING)
-	ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-	WITH SERDEPROPERTIES (
-		"separatorChar" = ",",
-		"quoteChar" = '"',
-		"escapeChar" = '\\'
-	)
-	STORED AS TEXTFILE
+(ProviderID VARCHAR(10), HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode VARCHAR(5), County STRING, PhoneNumber BIGINT, MeasureName STRING, MeasureID STRING, ComparedToNat STRING, Denominator STRING, Score STRING, LowerEst STRING, HigherEst STRING, Footnote STRING, MeasureStartDate TIMESTAMP, MeasureEndDate TIMESTAMP)
+	ROW FORMAT DELIMITED
+	FIELDS TERMINATED BY ','
+	STORED as TEXTFILE
 	LOCATION '/user/w205/hospital_compare/readmissions';
 
 
-# Table: survey_responses.csv
+--Table: survey_responses.csv
+DROP TABLE IF EXISTS survey_responses;
 CREATE EXTERNAL TABLE survey_responses
-		(ProviderID STRING, HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode STRING, County STRING, PhoneNumber STRING,
-		CommunicationNursesAch STRING, CommunicationNursesImp STRING, CommunicationNursesScore STRING,
-		CommunicationDoctorsAch STRING, CommunicationDoctorsImp STRING, CommunicationDoctorsScore STRING,
-		ResposivenessStaffAch STRING, ResposivenessStaffImp STRING, ResposivenessStaffScore STRING,
-		PainManagementAch STRING, PainManagementImp STRING, PainManagementScore STRING,
-		CommunicationMedicinesAch STRING, CommunicationMedicinesImp STRING, CommunicationMedicinesScore STRING,
-		CleanlinessQuitnessAch STRING, CleanlinessQuitnessImp STRING, CleanlinessQuitnessScore STRING,
-		DischargeInformationAch STRING, DischargeInformationImp STRING, DischargeInformationScore STRING,
-		OverallAch STRING, OverallImp STRING, OverallScore STRING,
-		HCAHPSBaseScore STRING, HCAHPSConsistencyScore STRING)
-	ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-	WITH SERDEPROPERTIES (
-		"separatorChar" = ",",
-		"quoteChar" = '"',
-		"escapeChar" = '\\'
-	)
-	STORED AS TEXTFILE
+(ProviderID VARCHAR(10), HospitalName STRING, Address STRING, City STRING, State STRING, ZIPcode VARCHAR(5), County STRING, PhoneNumber BIGINT, CommunicationNursesAch STRING, CommunicationNursesImp STRING, CommunicationNursesScore STRING, CommunicationDoctorsAch STRING, CommunicationDoctorsImp STRING, CommunicationDoctorsScore STRING, ResposivenessStaffAch STRING, ResposivenessStaffImp STRING, ResposivenessStaffScore STRING, PainManagementAch STRING, PainManagementImp STRING, PainManagementScore STRING, CommunicationMedicinesAch STRING, CommunicationMedicinesImp STRING, CommunicationMedicinesScore STRING, CleanlinessQuitnessAch STRING, CleanlinessQuitnessImp STRING, CleanlinessQuitnessScore STRING, DischargeInformationAch STRING, DischargeInformationImp STRING, DischargeInformationScore STRING, OverallAch STRING, OverallImp STRING, OverallScore STRING, HCAHPSBaseScore STRING, HCAHPSConsistencyScore STRING)
+	ROW FORMAT DELIMITED
+	FIELDS TERMINATED BY ','
+	STORED as TEXTFILE
 	LOCATION '/user/w205/hospital_compare/survey_responses';
 
