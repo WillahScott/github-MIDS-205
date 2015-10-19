@@ -3,29 +3,29 @@
 
 
 # Read all Hive external tables
-hospitals = sc.textfile('hospitals.txt')
-effective_care = sc.textfile('effective_care.txt')
-measure_dates = sc.textfile('measure_dates.txt')
-readmissions = sc.textfile('readmissions.txt')
-surveys = sc.textfile('survey_responses.txt')
+hospitals = sc.textFile('hospitals.txt')
+effective_care = sc.textFile('effective_care.txt')
+measure_dates = sc.textFile('measure_dates.txt')
+readmissions = sc.textFile('readmissions.txt')
+surveys = sc.textFile('survey_responses.txt')
 
 
 # State entity
 State = hospitals.select('State').distinct()
-sc.saveAsTextFile(State)
+State.saveAsTextFile()
 
 
 # Hospital entity
 hosp_cols = ['ProviderID', 'HospitalName', 'State', 'HospitalType', 'HospitalOwnership', 'EmergencyServices']
 Hospital = hospitals.select(hosp_cols).withColumnRenamed('ProviderID', 'HospitalID')
-sc.saveAsTextFile(Hospital)
+Hospital.saveAsTextFile()
 
 
 # Procedure entity
 proc_cols = ['MeasureID', 'MeasureName', 'HospitalName', 'Score', 'Sample', 'Footnote', 'MeasureStartDate', 'MeasureEndDate']
 Procedure = effective_care.select(proc_cols).leftjoin(hospitals.select(['HospitalID', 'HospitalName'])).drop('HospitalName')
 Procedure = Procedure.withColumnRenamed('MeasureID', 'ProcedureID').withColumnRenamed('MeasureName', 'ProcedureName')
-sc.saveAsTextFile(Procedure)
+Procedure.saveAsTextFile()
 
 
 # Readmission entity
@@ -38,5 +38,5 @@ sc.saveAsTextFile(Readmission)
 # Survey entity
 survey_col_drop = ['Address', 'City', 'State', 'ZIPcode', 'County']
 Survey = surveys.selectWithout(survey_col_drop).withColumnRenamed('ProviderID', 'HospitalID')
-sc.saveAsTextFile(Survey)
+Survey.saveAsTextFile()
 
