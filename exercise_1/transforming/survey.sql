@@ -1,17 +1,18 @@
--- Survey entity
-CREATE TABLE survey_e AS
-	SELECT  s.providerid as HospitalID,
-			regexp_extract(s.OverallAch, "([0-9][0-9]+) out of ([0-9]{2}) ", 1) / regexp_extract(s.OverallAch, "([0-9][0-9]+) out of ([0-9]{2}) ", 2) as OverallAch,
-			regexp_extract(s.OverallImp, "([0-9][0-9]+) out of ([0-9]{2}) ", 1) / regexp_extract(s.OverallImp, "([0-9][0-9]+) out of ([0-9]{2}) ", 2) as OverallImp,
-			
-			( s.HCAHPSBaseScore - agg.HCAHPSBaseScore_avg ) / agg.HCAHPSBaseScore_stdev as HCAHPSBaseScore_std,
-			( s.HCAHPSConsistencyScore - agg.HCAHPSConsistencyScore_avg ) / agg.HCAHPSConsistencyScore_stdev as HCAHPSConsistencyScore_std
 
-	FROM survey_responses as s
-	CROSS JOIN (
-		SELECT  AVG(HCAHPSBaseScore) as HCAHPSBaseScore_avg,
-				STDEV(HCAHPSBaseScore) as HCAHPSBaseScore_stdev,
-				AVG(HCAHPSConsistencyScore) as HCAHPSConsistencyScore_avg,
-				STDEV(HCAHPSConsistencyScore) as HCAHPSConsistencyScore_stdev
-		FROM survey_responses
-		) as agg;
+
+DROP TABLE IF EXISTS hospscore_by_proc;
+CREATE TABLE hospscore_by_proc AS
+	SELECT  ProcedureName,
+			AVG(regexp_extract(Score,'\"([0-9]*)\"',1)) as avg_hospscore
+	FROM procedure_e
+	WHERE CAST(regexp_extract(Score,'\"([0-9]*)\"',1) as INT) IS NOT NULL
+	GROUP BY ProcedureName;
+
+
+-- Calculate correlations with variability_proc from hospital_variability/proc_variability
+DROP TABLE IF EXISTS correlations_proc;
+CREATE TABLE correlations_proc AS
+	SELECT  corr(pr.proc_variability, hs.avg_hospscore) as correlation
+	FROM variability_proc as pr
+	INNER JOIN hospscore_by_proc as hs
+		ON pr.ProcedureName = hs.ProcedureName;

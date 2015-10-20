@@ -1,21 +1,20 @@
 
 -- EXPLORE BEST STATES
+-- Similar to best_hospitals/get_best_hospitals.sql but using State as aggregation level
 
-
--- Deciles for each, 1 = 10%, 2 = 11%-20%, ...
+-- Deciles for each, 1 = 0%-10%, 2 = 11%-20%, ... (10 is best score)
+DROP TABLE IF EXISTS proc_aux_bs;
 CREATE TABLE proc_aux_bs AS
-	SELECT h.State, ntile(10) OVER (PARTITION BY p.Score) as rank_procedure
-	FROM ( 
-		SELECT *
-		FROM procedure_e
-		WHERE CAST(Score as INT) IS NOT NULL
-		) as p
-	LEFT JOIN hospital_e as h
-		ON p.HospitalID = h.HospitalID;
+	SELECT State, ntile(10) OVER (PARTITION BY Score) as rank_procedure
+	FROM procedure_e
+	WHERE CAST(regexp_extract(Score,'\"([0-9]*)\"',1) as INT) IS NOT NULL;
 
 -- Median(deciles) group by State and sort by median score
-SELECT State, PERCENTILE(rank_procedure, 0.5) as median_score
+DROP TABLE IF EXISTS best_hospitals;
+CREATE TABLE best_states AS
+	SELECT  State, PERCENTILE(rank_procedure, 0.5) as median_score
 	FROM proc_aux_bs
 	GROUP BY State
 	ORDER BY median_score DESC;
+
 
